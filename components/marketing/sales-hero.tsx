@@ -1,22 +1,18 @@
 import Link from "next/link";
 import { WebsitePreview } from "./examples";
-import { UmkmExamples } from "./umkm-examples";
+import { StudioHero } from "./studio-experience";
 import { ServiceIcon } from "./service-icon";
 import s from "./marketing.module.css";
 
 export function SalesHero({ language = "en" }: { language?: "en" | "id" }) {
   const en = language === "en";
+  if (!en) return <StudioHero />;
   const details = en
     ? ["Your rooms", "A direct enquiry", "Your own website"]
     : ["Informasi usaha", "Kontak langsung", "Website milik Anda"];
   return (
     <section className={s.salesHero}>
       <div className={s.heroHeading}>
-        <p className={s.eyebrow}>
-          {en
-            ? "WUUS / Websites for independent hotels"
-            : "WUUS / Desain dan pengembangan website"}
-        </p>
         <h1>
           {en ? "A place worth" : "Butuh website"}
           <br />
@@ -50,10 +46,7 @@ export function SalesHero({ language = "en" }: { language?: "en" | "id" }) {
         </p>
       </div>
       <div className={s.heroShowcase}>
-        <div className={s.showcaseNotes}>
-          <span className={s.showcaseIndex}>
-            01 / {en ? "A design in context" : "Desain dalam konteks"}
-          </span>
+        {en ? <div className={s.showcaseNotes}>
           <h2>
             {en
               ? "A little of your world. Online."
@@ -85,8 +78,8 @@ export function SalesHero({ language = "en" }: { language?: "en" | "id" }) {
               ? "AI-generated concept imagery. Not a client project."
               : "Contoh susunan website. Nama usaha dan isinya fiktif."}
           </p>
-        </div>
-        {en ? <WebsitePreview language={language} /> : <UmkmExamples compact />}
+        </div> : null}
+        <WebsitePreview language={language} />
       </div>
     </section>
   );

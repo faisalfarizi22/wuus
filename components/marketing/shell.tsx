@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { BrandArtwork } from "./brand-artwork";
+import { StudioSound } from "./studio-sound";
+import { StudioClosing, StudioExperience } from "./studio-experience";
+import WebsiteChat from "@/components/sales-chat/WebsiteChat";
 import s from "./marketing.module.css";
 type Language = "en" | "id";
 export function Brand({ href = "/hospitality" }: { href?: string }) {
@@ -97,7 +100,7 @@ export function MarketingHeader({
     </header>
   );
 }
-export function MarketingFooter({ language = "en" }: { language?: Language }) {
+export function MarketingFooter({ language = "en", experience = false }: { language?: Language; experience?: boolean }) {
   const en = language === "en";
   return (
     <footer className={s.footer}>
@@ -119,6 +122,7 @@ export function MarketingFooter({ language = "en" }: { language?: Language }) {
             </Link>
           </div>
         </div>
+        {en || experience ? null : <StudioSound />}
         <div className={s.footerBottom}>
           <span>© {new Date().getFullYear()} WUUS</span>
           <div className={s.footerLinks}>
@@ -138,16 +142,24 @@ export function MarketingShell({
   children,
   language = "en",
   review = false,
+  experience = false,
 }: {
   children: React.ReactNode;
   language?: Language;
   review?: boolean;
+  experience?: boolean;
 }) {
+  if (experience && language === "id") return <StudioExperience>
+    {children}
+    <StudioClosing />
+    <WebsiteChat />
+  </StudioExperience>;
   return (
     <div lang={language} className={s.site}>
       <MarketingHeader language={language} review={review} />
       {children}
       <MarketingFooter language={language} />
+      {language === "id" ? <WebsiteChat /> : null}
     </div>
   );
 }

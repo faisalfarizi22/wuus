@@ -2,12 +2,32 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
-import { ArrowUpRight, ArrowRight, Check, Copy, ChevronDown, Ruler, X } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowUpRight, ArrowRight, Check, ChevronDown, Ruler, Menu, X } from 'lucide-react';
 import { categories, furniture, furnitureSummary, materials, quoteFurniture, rupiah } from '@/lib/ruang-kayu';
 import styles from './ruang-kayu.module.css';
+import {ConceptChoiceGuide, ConceptSectionNavigation, SummaryActions} from './concept-tools';
+import {conceptGuides} from './concept-guides';
+
+function FurnitureFootprint({width, depth, material}: {width:number; depth:number; material:string}) {
+  const span = width * 1.12;
+  const left = (420 - span) / 2;
+  const top = 54;
+  const height = depth * .9;
+  return <figure className={styles.footprint}>
+    <svg viewBox="0 0 420 202" role="img" aria-label={`Tampak atas meja, panjang ${width} sentimeter dan lebar ${depth} sentimeter`}>
+      <rect className={styles[`wood_${material}`]} x={left} y={top} width={span} height={height} rx="2"/>
+      <path d={`M${left} 30v12 M${left} 36h${span} M${left+span} 30v12`} fill="none"/>
+      <text x="210" y="25" textAnchor="middle">{width} cm</text>
+      <path d={`M${left+span+10} ${top}h12 M${left+span+16} ${top}v${height} M${left+span+10} ${top+height}h12`} fill="none"/>
+      <text x={left+span+26} y={top+height/2+4}>{depth} cm</text>
+    </svg>
+    <figcaption>Jejak meja · tampak atas, tanpa ruang kursi.</figcaption>
+  </figure>;
+}
 
 export function RuangKayu() {
+  const [navOpen, setNavOpen] = useState(false);
   const [category, setCategory] = useState<string>('Semua');
   const [productId, setProductId] = useState('aruna');
   const [materialId, setMaterialId] = useState('sungkai');
@@ -16,7 +36,6 @@ export function RuangKayu() {
   const [note, setNote] = useState('');
   const [summary, setSummary] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
-  const summaryRef = useRef<HTMLTextAreaElement>(null);
   const selected = furniture.find(item => item.id === productId)!;
   const config = { productId, materialId, width: Number(width), quantity: Number(quantity) };
   const quote = quoteFurniture(config);
@@ -25,23 +44,14 @@ export function RuangKayu() {
     setProductId(id); setWidth(String(item.width)); setSummary(''); setCopyStatus('');
   }
   function invalidate() { setSummary(''); setCopyStatus(''); }
-  async function copySummary() {
-    try {
-      if (!navigator.clipboard) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(summary);
-      setCopyStatus('Ringkasan tersalin. Tidak ada pesan yang dikirim.');
-    } catch {
-      summaryRef.current?.focus(); summaryRef.current?.select();
-      setCopyStatus('Salin otomatis tidak tersedia. Teks sudah dipilih; gunakan menu Salin atau Ctrl/Cmd+C.');
-    }
-  }
   return <div className={styles.site}>
+    <ConceptSectionNavigation/>
     <a className={styles.skip} href="#konten-ruang">Lewati ke konten</a>
     <div className={styles.demo}><span>Contoh desain WUUS <span className={styles.demoDetail}>· Brand, foto AI & harga ilustratif</span></span><Link href="/">Kembali ke WUUS <ArrowUpRight size={13} /></Link></div>
     <header className={styles.header}>
       <a href="#" className={styles.logo} aria-label="Ruang Kayu, ke atas">ruang<span>kayu</span><i /></a>
-      <nav aria-label="Navigasi Ruang Kayu"><a href="#koleksi">Koleksi</a><a href="#material">Material & cerita</a><a href="#proses">Cara memesan</a></nav>
-      <a href="#rancang" className={styles.headerCta}>Rancang milikmu <ArrowUpRight size={16} /></a>
+      <nav aria-label="Navigasi Ruang Kayu" id="ruang-kayu-navigation" className={navOpen?styles.navOpen:undefined}><a href="#koleksi" onClick={()=>setNavOpen(false)}>Koleksi</a><a href="#material" onClick={()=>setNavOpen(false)}>Material & cerita</a><a href="#proses" onClick={()=>setNavOpen(false)}>Cara memesan</a></nav>
+      <a href="#rancang" className={styles.headerCta} onClick={()=>setNavOpen(false)}>Rancang milikmu <ArrowUpRight size={16} /></a><button className={styles.menuToggle} type="button" aria-label={navOpen?'Tutup navigasi':'Buka navigasi'} aria-expanded={navOpen} aria-controls="ruang-kayu-navigation" onClick={()=>setNavOpen(!navOpen)}>{navOpen?<X size={20}/>:<Menu size={20}/>}</button>
     </header>
     <main id="konten-ruang">
       <section className={styles.hero} aria-labelledby="ruang-title">
@@ -52,6 +62,7 @@ export function RuangKayu() {
         <a href="#material" className={styles.heroNote}><span>Keindahan ada<br />pada detailnya.</span><ArrowUpRight size={22} /></a>
       </section>
       <div className={styles.philosophy}><p>Bukan sekadar mengisi ruang.<br /><span>Membuatnya terasa seperti rumah.</span></p><div>Serat yang berbeda pada setiap bidang.<br />Bentuk sederhana untuk dipakai setiap hari.</div></div>
+      <ConceptChoiceGuide {...conceptGuides['ruang-kayu']} target="#rancang" onChoose={chooseProduct}/>
       <section id="koleksi" className={styles.collection} aria-labelledby="koleksi-title">
         <div className={styles.sectionHead}><h2 id="koleksi-title">Temukan tempatnya.</h2><p>Satu keluarga bentuk.<br />Berbagai cara menikmati ruang.</p></div>
         <div className={styles.filters} role="group" aria-label="Filter koleksi">{categories.map(item => <button key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
@@ -63,14 +74,14 @@ export function RuangKayu() {
         <p className={styles.photoNote}>Visual AI menunjukkan bahasa desain koleksi, bukan foto produk siap jual. Harga adalah simulasi.</p>
       </section>
       <section className={styles.story} id="material" aria-labelledby="material-title"><div className={styles.detailImage}><Image src="/images/concepts/ruang-kayu/detail.webp" alt="Ilustrasi detail serat dan sambungan furniture kayu" fill sizes="(max-width: 700px) 100vw, 50vw" /><span>Biarkan materialnya bicara.</span></div><div className={styles.storyCopy}><h2 id="material-title">Ada kehidupan<br />di setiap serat.</h2><p>Warna yang tidak seragam. Garis yang tidak berulang. Justru di sanalah kayu menemukan karakternya.</p><p>Dalam konsep ini, material dan ukuran bisa dipilih sejak awal. Supaya bentuk yang kamu sukai juga cocok dengan cara kamu hidup.</p><div className={styles.materialList}>{materials.map(material => <div key={material.id}><span className={`${styles.swatch} ${styles[material.id]}`} /><span><strong>{material.name}</strong><small>{material.note}</small></span></div>)}</div></div></section>
-      <section id="rancang" className={styles.configure} aria-labelledby="rancang-title"><div className={styles.configIntro}><Ruler size={28} strokeWidth={1.3} /><h2 id="rancang-title">Ukuran ruangmu.<br /><em>Pilihanmu.</em></h2><p>Mulai dari satu meja. Pilih karakter kayu dan panjang yang pas, lalu simpan ringkasan kebutuhanmu.</p><div className={styles.dimension}><span>{selected.name}</span><strong>{width || '—'} <small>× {selected.depth} × {selected.height} cm</small></strong><span>Panjang × lebar × tinggi</span></div><p className={styles.configNote}>Simulasi ini bekerja di perangkatmu. Tidak ada data yang dikirim dan tidak ada pesanan dibuat.</p></div>
+      <section id="rancang" className={styles.configure} aria-labelledby="rancang-title"><div className={styles.configIntro}><Ruler size={28} strokeWidth={1.3} /><h2 id="rancang-title">Ukuran ruangmu.<br /><em>Pilihanmu.</em></h2><p>Mulai dari satu meja. Pilih karakter kayu dan panjang yang pas, lalu simpan ringkasan kebutuhanmu.</p><div className={styles.dimension}><span>{selected.name}</span><strong>{width || '—'} <small>× {selected.depth} × {selected.height} cm</small></strong><span>Panjang × lebar × tinggi</span></div>{quote.ok&&<FurnitureFootprint width={quote.width} depth={quote.product.depth} material={materialId}/>}<p className={styles.configNote}>Simulasi ini bekerja di perangkatmu. Tidak ada data yang dikirim dan tidak ada pesanan dibuat.</p></div>
         <form className={styles.configForm} onSubmit={event => { event.preventDefault(); if (quote.ok) { setSummary(furnitureSummary(config, note)); setCopyStatus('Ringkasan siap disalin. Belum dikirim ke siapa pun.'); } }}>
           <label htmlFor="rk-product">Pilih koleksi</label><div className={styles.selectWrap}><select id="rk-product" value={productId} onChange={event => chooseProduct(event.target.value)}>{furniture.map(item => <option value={item.id} key={item.id}>{item.name} — {item.category}</option>)}</select><ChevronDown size={17} /></div>
           <fieldset><legend>Karakter material</legend><div className={styles.materialOptions}>{materials.map(item => <label key={item.id}><input type="radio" name="rk-material" value={item.id} checked={materialId === item.id} onChange={() => { setMaterialId(item.id); invalidate(); }} /><span className={`${styles.swatch} ${styles[item.id]}`} /><span>{item.name}</span></label>)}</div></fieldset>
           <div className={styles.inputRow}><div><label htmlFor="rk-width">Panjang (cm)</label><input id="rk-width" type="number" min={selected.min} max={selected.max} step={10} required value={width} onChange={event => { setWidth(event.target.value); invalidate(); }} aria-describedby="rk-width-help" /><small id="rk-width-help">{selected.min}–{selected.max} cm · kelipatan 10</small></div><div><label htmlFor="rk-quantity">Jumlah unit</label><input id="rk-quantity" type="number" min={1} max={10} step={1} required value={quantity} onChange={event => { setQuantity(event.target.value); invalidate(); }} /><small>1–10 unit</small></div></div>
           <label htmlFor="rk-note">Catatan ruang <span>(opsional)</span></label><textarea id="rk-note" maxLength={500} rows={2} value={note} placeholder="Misalnya: untuk ruang makan 3 × 4 meter" onChange={event => { setNote(event.target.value); invalidate(); }} />
           <div className={styles.quote} aria-live="polite">{quote.ok ? <><span>Estimasi total <small>{quote.quantity} unit × {rupiah(quote.unitPrice)}</small></span><strong>{rupiah(quote.total)}</strong></> : <p role="alert">{quote.error}</p>}</div><p className={styles.finePrint}>Harga ilustratif. Belum termasuk pengiriman dan pemasangan. Bukan penawaran final.</p><button type="submit" className={styles.darkButton} disabled={!quote.ok}>Buat ringkasan kebutuhan <ArrowUpRight size={20} /></button>
-          {summary && <div className={styles.summary}><div><h3>Ringkasan kebutuhanmu</h3><button type="button" onClick={() => { setSummary(''); setCopyStatus(''); }} aria-label="Tutup ringkasan"><X size={18} /></button></div><label htmlFor="rk-summary" className={styles.srOnly}>Teks ringkasan untuk disalin manual</label><textarea id="rk-summary" ref={summaryRef} readOnly value={summary} rows={9} /><button type="button" onClick={copySummary} className={styles.copyButton}><Copy size={16} />Salin ringkasan</button></div>}
+          {summary && <div className={styles.summary}><div><h3>Ringkasan kebutuhanmu</h3><button type="button" onClick={() => { setSummary(''); setCopyStatus(''); }} aria-label="Tutup ringkasan"><X size={18} /></button></div><label htmlFor="rk-summary" className={styles.srOnly}>Teks ringkasan untuk disalin manual</label><textarea id="rk-summary" readOnly value={summary} rows={9} /><SummaryActions text={summary} filename="rencana-ruang-kayu"/></div>}
           <p className={styles.copyStatus} role="status">{copyStatus}</p>
         </form>
       </section>

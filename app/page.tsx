@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { MarketingShell, StudioAvatar } from "@/components/marketing/shell";
-import { UmkmExamples } from "@/components/marketing/umkm-examples";
+import { KineticGallery } from "@/components/marketing/kinetic-gallery";
 import { ServiceIcon } from "@/components/marketing/service-icon";
+import { DesignSpotlight } from "@/components/marketing/design-spotlight";
 import { SalesHero } from "@/components/marketing/sales-hero";
 import { UmkmPricing } from "@/components/marketing/umkm-pricing";
 import s from "@/components/marketing/marketing.module.css";
@@ -57,18 +58,18 @@ const questions = [
 ];
 export default function Home() {
   return (
-    <MarketingShell language="id">
+    <MarketingShell language="id" experience>
       <main id="main">
         <SalesHero language="id" />
+        <DesignSpotlight />
         <div className={`${s.container} ${s.proofLine}`}>
           <span>Nyaman dibuka di ponsel</span>
           <span>Cakupan dan harga tertulis</span>
           <span>Pratinjau sebelum pelunasan</span>
           <span>Serah terima kode website</span>
         </div>
-        <section id="services" className={`${s.container} ${s.section}`}>
+        <section id="services" className={`${s.container} ${s.section} ${s.studioServices}`}>
           <div className={s.sectionHead}>
-            <p className={s.eyebrow}>Layanan WUUS</p>
             <h2>
               Apa yang ingin Anda
               <br />
@@ -112,29 +113,24 @@ export default function Home() {
           </div>
         </section>
         <UmkmPricing />
-        <section id="examples" className={`${s.section} ${s.blueSection}`}>
-          <div className={s.container}>
-            <div className={s.sectionHead}>
-              <p className={s.eyebrow}>Contoh desain</p>
-              <h2>
-                Untuk yang jual produk,
-                <br />
-                maupun yang menawarkan jasa.
-              </h2>
-              <p>
-                Setiap usaha punya informasi yang berbeda. Pilih contoh di bawah
-                untuk melihat bagaimana menu, layanan atau katalog bisa disusun.
-              </p>
-            </div>
-            <UmkmExamples />
+        <KineticGallery />
+        <section className={`${s.container} ${s.handover}`} aria-labelledby="handover-title">
+          <div>
+            <h2 id="handover-title">Jelas yang dibuat.<br />Jelas yang Anda terima.</h2>
+            <p>Website dipakai untuk menjalankan usaha. Anda perlu tahu cara kerjanya, siapa yang mengelola, dan biaya yang akan datang.</p>
           </div>
+          <dl>
+            <div><dt>Penawaran tertulis</dt><dd>Fitur, halaman, batas revisi, jadwal, serta biaya awal dan perpanjangan disepakati sebelum pengerjaan.</dd></div>
+            <div><dt>Hasil yang bisa diperiksa</dt><dd>Anda mencoba tampilan di ponsel dan fungsi sesuai cakupan lewat tautan pratinjau sebelum pelunasan.</dd></div>
+            <div><dt>Kode dan panduan</dt><dd>Kode sumber dan panduan diserahkan setelah pelunasan. Akun domain dan hosting sebaiknya milik Anda.</dd></div>
+            <div><dt>Dukungan setelah peluncuran</dt><dd>Perbaikan kesalahan fungsi sesuai kesepakatan selama 14 hari. Perubahan atau pemeliharaan berikutnya dibahas terpisah.</dd></div>
+          </dl>
         </section>
         <section
           id="process"
           className={`${s.container} ${s.section} ${s.split}`}
         >
           <div>
-            <p className={s.eyebrow}>Cara kerja</p>
             <h2>
               Prosesnya bisa Anda
               <br />
@@ -164,7 +160,6 @@ export default function Home() {
           <div className={`${s.container} ${s.about}`}>
             <StudioAvatar />
             <div>
-              <p className={s.eyebrow}>Tentang studio</p>
               <h2>
                 Diskusi langsung
                 <br />
@@ -186,7 +181,6 @@ export default function Home() {
         </section>
         <section id="faq" className={`${s.container} ${s.section} ${s.split}`}>
           <div>
-            <p className={s.eyebrow}>Sebelum mulai</p>
             <h2>Pertanyaan sebelum memulai.</h2>
           </div>
           <div className={s.faq}>
@@ -196,49 +190,6 @@ export default function Home() {
                 <p>{answer}</p>
               </details>
             ))}
-          </div>
-        </section>
-        <section
-          id="contact"
-          className={`${s.section} ${s.contactSection} ${s.needsSection}`}
-        >
-          <div className={`${s.container} ${s.needsStory}`}>
-            <div>
-              <div className={s.sectionHead}>
-                <p className={s.eyebrow}>Mulai dari kebutuhan Anda</p>
-                <h2>
-                  Ceritakan usaha Anda.
-                  <br />
-                  Mulai dari yang paling dibutuhkan.
-                </h2>
-                <p>
-                  Kirim jenis usaha, kota atau provinsi, kebutuhan utama dan
-                  kisaran anggaran. Kami akan membantu menentukan layanan
-                  yang sesuai melalui email atau WhatsApp.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href="mailto:hallo@webuntukusaha.com?subject=Diskusi%20website%20usaha"
-                  className={s.button}
-                >
-                  Kirim kebutuhan via email
-                </a>
-                <a
-                  href="https://wa.me/6281383521750?text=Halo%20WUUS%2C%20saya%20ingin%20membahas%20website%20usaha."
-                  className={s.buttonLight}
-                >
-                  Konsultasi via WhatsApp
-                </a>
-              </div>
-              <p className={s.smallPrint}>
-                hallo@webuntukusaha.com · Jakarta, Indonesia
-              </p>
-            </div>
-            <div className={s.needsVisual}>
-              <div className={s.needsPhoto} aria-hidden="true" />
-              <p className={s.storyCaption}>Foto ilustratif dibuat dengan AI.</p>
-            </div>
           </div>
         </section>
       </main>

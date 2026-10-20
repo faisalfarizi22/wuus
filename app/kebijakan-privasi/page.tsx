@@ -13,11 +13,11 @@ const sections = [
   ],
   [
     "Informasi yang Anda kirim",
-    "Form review mengumpulkan nama properti, tautan online, nama kontak, email, pesan dan jenis permintaan untuk membalas, menyiapkan review dan membahas proyek. ID permintaan, sumber, waktu dan versi persetujuan juga dicatat. Jika Anda memilih email atau WhatsApp, layanan tersebut menangani pesan yang Anda kirim. Jangan sertakan data tamu, password, detail kartu pembayaran atau dokumen identitas pada form.",
+    "Form review mengumpulkan nama usaha atau properti, tautan online, nama kontak, email, pesan dan jenis permintaan untuk membalas, menyiapkan review dan membahas proyek. ID permintaan, sumber, waktu dan versi persetujuan juga dicatat. Chat website menyimpan isi percakapan, waktu, status balasan dan persetujuan Anda. Jika Anda memilih email atau WhatsApp, layanan tersebut menangani pesan yang Anda kirim. Jangan sertakan data pelanggan, kata sandi, PIN, detail kartu pembayaran atau dokumen identitas dalam pesan.",
   ],
   [
     "Pengamanan dan layanan yang digunakan",
-    "Website menggunakan Vercel untuk hosting, Supabase untuk penyimpanan inquiry dan login owner, Resend untuk notifikasi owner, serta Vercel Analytics dan Speed Insights untuk informasi trafik dan performa. Balasan ditangani melalui email bisnis. Hash ber-key dari alamat jaringan dipakai untuk membatasi pengiriman berulang, terpisah dari inquiry. Penyedia hosting dapat memproses log teknis untuk operasi dan keamanan website. Penyedia proyek atau pembayaran tambahan dijelaskan sebelum proyek berbayar dimulai.",
+    "Website menggunakan Vercel untuk hosting, Supabase untuk penyimpanan permintaan dan percakapan serta login pengelola, Resend untuk notifikasi pengelola, serta Vercel Analytics dan Speed Insights untuk informasi trafik dan performa. Cookie percakapan yang hanya dapat dibaca server berlaku hingga tujuh hari agar Anda dapat kembali ke chat pada browser yang sama. Draft pesan disimpan sementara di tab browser sampai pengiriman dikonfirmasi atau sesi tab berakhir. Hash berkunci dari alamat jaringan dipakai untuk membatasi pengiriman berulang. Penyedia hosting dapat memproses log teknis untuk operasi dan keamanan website. Penyedia proyek atau pembayaran tambahan dijelaskan sebelum proyek berbayar dimulai.",
   ],
   [
     "Lokasi pemrosesan",
@@ -25,19 +25,19 @@ const sections = [
   ],
   [
     "Penyimpanan dan permintaan data",
-    "Kebijakan operasional WUUS adalah meninjau dan menghapus inquiry prospek yang tidak aktif setelah 90 hari. Korespondensi proyek aktif dan catatan yang diperlukan untuk pembukuan disimpan sesuai kebutuhan proyek dan periode pencatatan yang berlaku. Catatan pembatasan jaringan dibersihkan dalam pemeliharaan rutin setelah tidak diperlukan. Anda dapat meminta salinan, koreksi, penghapusan inquiry atau penghentian kontak melalui email bisnis. WUUS memeriksa permintaan dan menjelaskan bila ada catatan yang harus disimpan.",
+    "Pengelola meninjau permintaan dan percakapan calon pelanggan yang tidak aktif setelah 90 hari untuk penghapusan; pemeriksaan ini dilakukan secara manual. Korespondensi proyek aktif dan catatan yang diperlukan untuk pembukuan disimpan sesuai kebutuhan proyek dan periode pencatatan yang berlaku. Catatan pembatasan jaringan dibersihkan dalam pemeliharaan rutin setelah tidak diperlukan. Anda dapat meminta salinan, koreksi, penghapusan atau penghentian kontak melalui email bisnis. WUUS memeriksa permintaan dan menjelaskan bila ada catatan yang harus disimpan.",
   ],
   [
-    "Demo dan AI",
-    "Contoh properti merupakan konsep fiktif. Respons chat pada demo disiapkan sebelumnya dan tidak dikirim ke provider AI live. Layanan AI live dan pembelian kredit sedang tidak tersedia.",
+    "Contoh desain dan bantuan AI",
+    "Nama usaha dan isi pada contoh desain bersifat fiktif. Interaksi pada contoh desain tidak mengirim pesanan atau pembayaran. Untuk chat WUUS, tim dapat menggunakan bantuan Maya, asisten AI, saat sesi kerja Codex aktif. Konteks percakapan yang diperlukan dapat diproses melalui sesi tersebut untuk menyiapkan balasan. Balasan tidak selalu langsung tersedia; tidak ada layanan otomatis 24 jam yang dijanjikan. Data percakapan tidak ditampilkan sebagai materi promosi.",
   ],
 ];
 export default function PrivacyPage() {
   return (
     <MarketingShell language="id">
       <main id="main" className={`${s.container} ${s.legal}`}>
-        <p className={s.eyebrow}>Diperbarui 8 Oktober 2026</p>
         <h1>Informasi privasi</h1>
+        <p>Diperbarui 19 Oktober 2026</p>
         <div className="mt-10 space-y-8">
           {sections.map(([title, content]) => (
             <section key={title}>

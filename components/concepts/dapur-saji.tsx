@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { ArrowUpRight, ArrowRight, ArrowDown, Check, Minus, Plus, ShoppingBag, Leaf, Utensils, Menu, X } from 'lucide-react';
 import { menu, formatRupiah, orderSummary } from '@/lib/dapur-saji';
 import s from './dapur-saji.module.css';
+import {ConceptChoiceGuide, ConceptSectionNavigation, SummaryActions} from './concept-tools';
+import {conceptGuides} from './concept-guides';
 
 const categories=['Semua menu','Nasi box','Snack box','Paket berbagi'];
 const faqs=[
@@ -45,6 +47,7 @@ export function DapurSaji() {
     setResult(`Rencana pesanan Dapur Saji\nAcara: ${occasion}\nTanggal: ${date}\nArea: ${area.trim()}\n\n${summary.items.map(i=>`${i.name} × ${i.quantity}: ${formatRupiah(i.subtotal)}`).join('\n')}\n\nSubtotal makanan: ${formatRupiah(summary.total)}\nOngkir dan penyesuaian menu belum dihitung.\nCatatan: ${notes.trim()||'—'}\n\nContoh desain WUUS. Ringkasan hanya dibuat di perangkat ini; tidak ada pesanan yang dikirim.`);
   }
   return <div className={s.site}>
+    <ConceptSectionNavigation/>
     <a className={s.skip} href="#utama">Lewati navigasi</a>
     <div className={s.designBar}><Link href="/#examples">WUUS <ArrowUpRight size={13}/></Link><span>Contoh desain</span><Link href="/#contact">Ingin website seperti ini? <ArrowUpRight size={13}/></Link></div>
     <header className={s.header}><div className={s.nav}>
@@ -61,6 +64,7 @@ export function DapurSaji() {
         <div className={s.heroPhoto}><Image src="/images/concepts/dapur-saji/hero.webp" alt="Pilihan nasi ayam bakar dengan sayuran, sambal dan kudapan dalam sajian katering" fill priority sizes="(max-width: 800px) 100vw, 58vw"/><div className={s.photoNote}><strong>Ayam bakar,<br/>sambal & cerita.</strong><a href="#menu" aria-label="Lihat menu nasi ayam bakar"><ArrowDown size={20}/></a></div></div>
       </section>
       <div className={s.ribbon}><span>Makan siang kantor</span><i/><span>Rapat & pertemuan</span><i/><span>Kumpul keluarga</span><i/><span>Acara kecil di rumah</span></div>
+      <ConceptChoiceGuide {...conceptGuides['dapur-saji']} target="#menu" onChoose={setCategory}/>
       <section id="menu" className={s.section}>
         <div className={s.sectionHeading}><h2>Ada yang pas<br/>untuk acara Anda.</h2><p>Mulai dari satu kotak untuk setiap tamu, sampai hidangan untuk dinikmati bersama. Pilih menu dan atur jumlahnya di bawah.</p></div>
         <div className={s.filters} role="group" aria-label="Kategori menu">{categories.map(c=><button key={c} type="button" aria-pressed={category===c} onClick={()=>setCategory(c)}>{c}</button>)}</div>
@@ -83,7 +87,7 @@ export function DapurSaji() {
           <label>Area pengantaran<input required maxLength={120} value={area} placeholder="Contoh: Tebet, Jakarta Selatan" onChange={e=>{setArea(e.target.value);setResult('');}}/></label>
           <label>Catatan tambahan <span>(opsional)</span><textarea maxLength={1000} rows={3} value={notes} placeholder="Waktu makan, pilihan lauk, alergi atau kebutuhan lain" onChange={e=>{setNotes(e.target.value);setResult('');}}/></label>
           <button type="submit" className={s.primary} disabled={!summary.items.length}>Buat ringkasan pesanan <ArrowRight size={18}/></button>
-          {result&&<div className={s.result} role="status"><strong><Check size={18}/> Ringkasan siap. Belum ada pesanan yang dikirim.</strong><label htmlFor="ringkasan-pesanan">Ringkasan pesanan</label><textarea id="ringkasan-pesanan" readOnly rows={12} value={result}/><button type="button" className={s.copy} onClick={async()=>{try{await navigator.clipboard.writeText(result);setFeedback('Ringkasan berhasil disalin.');}catch{setFeedback('Belum bisa menyalin otomatis. Pilih teks ringkasan lalu salin secara manual.');}}}>Salin ringkasan</button></div>}
+          {result&&<div className={s.result} role="status"><strong><Check size={18}/> Ringkasan siap. Belum ada pesanan yang dikirim.</strong><label htmlFor="ringkasan-pesanan">Ringkasan pesanan</label><textarea id="ringkasan-pesanan" readOnly rows={12} value={result}/><SummaryActions text={result} filename="rencana-dapur-saji"/></div>}
         </form>
       </section>
       <section id="faq" className={`${s.section} ${s.faqSection}`}><div><h2>Sebelum<br/>memesan.</h2><p>Beberapa hal yang biasanya ingin Anda tahu lebih dulu.</p></div><div className={s.faq}>{faqs.map(([question,answer])=><details key={question}><summary>{question}<Plus size={18}/></summary><p>{answer}</p></details>)}</div></section>

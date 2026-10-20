@@ -17,3 +17,9 @@
 @media(prefers-reduced-motion:reduce){.site *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .bigPrice{display:block}
+
+.links a[aria-current=location]{text-decoration:underline;text-decoration-thickness:2px}
+.servicesList article:has(a[aria-current=true]) h3{color:var(--blue)}
+.planner input[type=radio]{accent-color:var(--blue)}
+.bigPrice{font-variant-numeric:tabular-nums}.result textarea{font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.site *,.site *::before,.site *::after{animation:none!important;transition:none!important}.primary:hover{transform:none}}

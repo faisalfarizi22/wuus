@@ -14,3 +14,10 @@
 @media(prefers-reduced-motion:reduce){.site *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .photoNote{display:flex;align-items:center;gap:16px}.photoNote strong{flex:1;margin:0}.photoNote a{position:static;flex:none;display:grid;place-items:center}
+
+/* The selected menu stays legible as the visitor moves toward the plan. */
+.links a[aria-current=location]{text-decoration:underline;text-decoration-thickness:2px}
+.menuItem:has(.quantity output) .quantity{background:#e5e9db}
+.menuItem:has(.quantity output) .menuInfo h3{color:#7b371e}
+.orderForm{scroll-margin-top:110px}.result textarea{font-variant-numeric:tabular-nums}
+@media(prefers-reduced-motion:reduce){.menuItem:hover .menuPhoto img{transform:none}}

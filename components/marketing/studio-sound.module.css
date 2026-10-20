@@ -1,0 +1,15 @@
+.sound { display:flex; align-items:center; flex-wrap:wrap; gap:8px 16px; padding-block:20px; color:#526275; font-size:12px; }
+.sound > span { margin-right:8px; }
+.sound button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px 12px; color:#1c2e43; background:#f3f5f7; border:0; border-radius:8px; font:inherit; cursor:pointer; }
+.sound button[aria-pressed=true] { background:#1c2e43; color:white; }
+.sound button:hover { text-decoration:underline; text-underline-offset:4px; }
+.sound button:focus-visible { outline:3px solid #80602e; outline-offset:4px; }
+.sound b { font-weight:400; opacity:.85; }
+.sound p { flex-basis:100%; margin:4px 0; }
+.sound.compact { padding:0;gap:6px;position:relative;flex-wrap:nowrap; }
+.compact button { width:44px;height:44px;padding:0;border-radius:50%;background:var(--studio-surface,#fffaf1);color:var(--studio-ink,#1c2e43);transition:background-color .2s,transform .2s; }
+.compact button[aria-pressed=true] { background:#f6cf83;color:#1c2e43; }
+.compact button:hover { background:#f6cf83;color:#1c2e43;transform:translateY(-2px); }
+.compact p { position:absolute;top:50px;right:0;width:230px;padding:12px;background:#fff7e8;color:#1c2e43;border-radius:10px;box-shadow:0 12px 25px #1c2e4320; }
+@media(prefers-reduced-motion:reduce){ .compact button { transition:none; }.compact button:hover { transform:none; } }
+@media(max-width:600px){ .sound { gap:8px; } .sound > span { flex-basis:100%; } }
