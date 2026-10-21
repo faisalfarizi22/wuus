@@ -111,6 +111,6 @@ export default function WebsiteChat() {
         <div className={s.actions}><a href={CONTACT} target="_blank" rel="noreferrer">Lanjut di WhatsApp</a><button type="submit" disabled={busy || !text.trim() || !consent}>{busy ? 'Menyimpan…' : pending ? 'Coba kirim lagi' : 'Kirim pesan'}<ArrowUp size={17} aria-hidden="true" /></button></div>
       </form>
     </section>}
-    <button type="button" ref={trigger} className={s.trigger} onClick={toggle} aria-expanded={open} aria-label={open ? 'Tutup chat WUUS' : 'Buka chat WUUS'}><MessageCircle size={20} aria-hidden="true" /><span>Konsultasi dengan WUUS</span></button>
+    <button type="button" ref={trigger} className={s.trigger} onClick={toggle} aria-expanded={open} title={open ? 'Tutup percakapan' : 'Konsultasi dengan WUUS'} aria-label={open ? 'Tutup chat WUUS' : 'Buka chat WUUS'}><MessageCircle size={20} aria-hidden="true" /><span>Konsultasi dengan WUUS</span></button>
   </div>;
 }

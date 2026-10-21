@@ -5,7 +5,8 @@
 .widget ::selection,.admin ::selection{background:var(--amber);color:var(--ink)}
 .widget button,.admin button{cursor:pointer;font:inherit}
 .widget button:disabled,.admin button:disabled{opacity:.55;cursor:default}
-.trigger{display:flex;align-items:center;justify-content:center;gap:10px;margin-left:auto;background:var(--ink);color:white;border:0;border-radius:12px;padding:15px 20px;box-shadow:0 8px 24px #1c2e4329;font-weight:650;font-size:14px}
+.trigger{display:flex;align-items:center;justify-content:center;width:52px;height:52px;gap:0;margin-left:auto;background:var(--ink);color:white;border:0;border-radius:50%;padding:0;box-shadow:0 8px 24px #1c2e4329;font-weight:650;font-size:14px}
+.trigger span{display:none}
 .trigger:hover{background:#2b435f}
 .panel{display:flex;flex-direction:column;max-height:min(690px,calc(100dvh - 112px));margin-bottom:12px;background:white;border-radius:16px;overflow:hidden;box-shadow:0 12px 48px #1c2e4333;animation:chat-enter .24s cubic-bezier(.16,1,.3,1)}
 .header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;background:var(--cream);padding:20px}

@@ -87,8 +87,8 @@ export function StudioSound({ compact = false }: { compact?: boolean }) {
 
   return <div className={`${s.sound} ${compact ? s.compact : ""}`} data-sound-controls>
     {compact ? null : <span>Suasana studio</span>}
-    <button type="button" aria-label={compact ? `Efek suara ${effects ? "aktif, matikan" : "mati, aktifkan"}` : undefined} title={`Efek suara: ${effects ? "aktif" : "mati"}`} aria-pressed={effects} onClick={() => { if (effects) setEffects(false); else if (audio()) setEffects(true); }}><Volume2 size={16} />{compact ? null : <>Efek suara <b>{effects ? "Aktif" : "Mati"}</b></>}</button>
-    <button type="button" aria-label={compact ? `Musik ${music ? "aktif, matikan" : "mati, aktifkan"}` : undefined} title={`Musik: ${music ? "aktif" : "mati"}`} aria-pressed={music} onClick={toggleMusic}><Headphones size={16} />{compact ? null : <>Musik <b>{music ? "Aktif" : "Mati"}</b></>}</button>
+    <button type="button" aria-label={compact ? `${effects ? "Matikan" : "Aktifkan"} efek suara klik` : undefined} title={`${effects ? "Matikan" : "Aktifkan"} efek suara klik`} aria-pressed={effects} onClick={() => { if (effects) setEffects(false); else if (audio()) setEffects(true); }}><Volume2 size={16} aria-hidden="true" />{compact ? <span className={s.tooltip} aria-hidden="true">Efek suara klik · {effects ? "aktif" : "mati"}</span> : <>Efek suara <b>{effects ? "Aktif" : "Mati"}</b></>}</button>
+    <button type="button" aria-label={compact ? `${music ? "Matikan" : "Aktifkan"} musik latar` : undefined} title={`${music ? "Matikan" : "Aktifkan"} musik latar`} aria-pressed={music} onClick={toggleMusic}><Headphones size={16} aria-hidden="true" />{compact ? <span className={s.tooltip} aria-hidden="true">Musik latar · {music ? "aktif" : "mati"}</span> : <>Musik <b>{music ? "Aktif" : "Mati"}</b></>}</button>
     {error ? <p role="status">{error}</p> : null}
   </div>;
 }

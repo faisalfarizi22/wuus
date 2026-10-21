@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, ArrowUpRight, MoveHorizontal } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, LayoutGrid, MoveHorizontal } from "lucide-react";
 import { conceptCatalog } from "@/lib/concept-catalog";
 import { clampGalleryScroll, galleryCategoryAt, galleryLean, galleryWheelPixels } from "@/lib/kinetic-gallery";
 import s from "./kinetic-gallery.module.css";
@@ -18,9 +18,11 @@ export function KineticGallery() {
   const rail = useRef<HTMLDivElement>(null);
   const progress = useRef<HTMLSpanElement>(null);
   const navigate = useRef<Navigate>(() => {});
+  const [layout, setLayout] = useState<"rail" | "grid">("rail");
   const [view, setView] = useState<GalleryView>({ category: "Kuliner", previous: false, next: true });
 
   useEffect(() => {
+    if (layout === "grid") return;
     const root = section.current, track = rail.current, meter = progress.current;
     if (!root || !track || !meter) return;
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -150,23 +152,32 @@ export function KineticGallery() {
       document.removeEventListener("visibilitychange", onVisibility); media.removeEventListener("change", onPreference);
       navigate.current = () => {};
     };
-  }, []);
+  }, [layout]);
 
-  return <section ref={section} id="design-catalog" className={s.gallery} aria-labelledby="design-catalog-title">
+  function visitCategory(category: string) {
+    if (layout === "rail") { navigate.current(category); return; }
+    setView(current => ({ ...current, category }));
+    const target = section.current?.querySelector<HTMLElement>(`[data-gallery-group="${category}"]`);
+    target?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }
+
+  return <section ref={section} id="examples" data-layout={layout} className={s.gallery} aria-labelledby="design-catalog-title">
+    <span id="design-catalog" className={s.legacyAnchor} aria-hidden="true" />
     <div className={s.heading}>
-      <h2 id="design-catalog-title">Beda usaha.<br /><em>Beda ceritanya.</em></h2>
-      <div className={s.intro}><p>Dari menu makan siang sampai koleksi pilihan. Jelajahi website yang dirancang mengikuti cara setiap usaha bekerja.</p><span><MoveHorizontal size={16} aria-hidden="true" /> Geser untuk menjelajahi semua contoh</span></div>
+      <h2 id="design-catalog-title">Lihat tampilannya.<br /><em>Coba cara kerjanya.</em></h2>
+      <div className={s.intro}><p>Delapan contoh website, dengan fitur yang bisa Anda coba langsung. Pilih yang mendekati usaha Anda, lalu jelajahi halaman lengkapnya.</p><span><MoveHorizontal size={16} aria-hidden="true" /> {layout === "rail" ? "Geser, gunakan panah, atau lihat semuanya." : "Semua contoh tampil, dikelompokkan menurut jenis usaha."}</span></div>
     </div>
     <div className={s.navigation}>
       <div className={s.categories} role="group" aria-label="Geser ke kategori contoh desain">
-        {groups.map(group => <button key={group.category} type="button" aria-pressed={view.category === group.category} aria-controls="design-gallery-rail" onClick={() => navigate.current(group.category)}>{group.category}<span>{group.items.length}</span></button>)}
+        {groups.map(group => <button key={group.category} type="button" aria-pressed={view.category === group.category} aria-controls="design-gallery-rail" onClick={() => visitCategory(group.category)}>{group.category}<span>{group.items.length}</span></button>)}
       </div>
-      <div className={s.arrows} role="group" aria-label="Navigasi contoh desain">
+      <button type="button" className={s.layoutToggle} aria-pressed={layout === "grid"} aria-controls="design-gallery-rail" onClick={() => setLayout(current => current === "rail" ? "grid" : "rail")}><LayoutGrid size={17} aria-hidden="true" />{layout === "rail" ? "Lihat semua" : "Mode geser"}</button>
+      {layout === "rail" ? <div className={s.arrows} role="group" aria-label="Navigasi contoh desain">
         <button type="button" aria-label="Contoh desain sebelumnya" disabled={!view.previous} onClick={() => navigate.current("previous")}><ArrowLeft size={20} /></button>
         <button type="button" aria-label="Contoh desain berikutnya" disabled={!view.next} onClick={() => navigate.current("next")}><ArrowRight size={20} /></button>
-      </div>
+      </div> : null}
     </div>
-    <div ref={rail} id="design-gallery-rail" className={s.rail} role="region" aria-label="Delapan contoh website, dikelompokkan menurut jenis usaha" tabIndex={0}>
+    <div ref={rail} id="design-gallery-rail" className={s.rail} role="region" aria-label="Delapan contoh website, dikelompokkan menurut jenis usaha" tabIndex={layout === "rail" ? 0 : undefined}>
       {groups.map(group => <div key={group.category} className={s.group} data-gallery-group={group.category} role="group" aria-labelledby={`gallery-${group.category.toLowerCase()}`}>
         <h3 id={`gallery-${group.category.toLowerCase()}`} className={s.groupTitle}>{group.category}<span>{group.items.length} contoh desain</span></h3>
         <div className={s.cards}>{group.items.map(item => <article className={s.card} key={item.slug}>
@@ -179,6 +190,6 @@ export function KineticGallery() {
         </article>)}</div>
       </div>)}
     </div>
-    <div className={s.bottom}><div className={s.progress} aria-hidden="true"><span ref={progress} /></div><p>Contoh desain untuk Anda jelajahi dan coba. Nama serta isi usaha bersifat fiktif.</p></div>
+    <div className={s.bottom}><div className={s.progress} aria-hidden="true"><span ref={progress} /></div><p>Contoh desain. Nama dan isi usaha fiktif; gambar usaha dibuat dengan AI.</p></div>
   </section>;
 }
