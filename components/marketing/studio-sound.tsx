@@ -4,90 +4,99 @@ import { useEffect, useRef, useState } from "react";
 import { Headphones, Volume2 } from "lucide-react";
 import s from "./studio-sound.module.css";
 
-// Locally synthesised tones. No microphone, media tracking, downloads or remote audio.
+// Audio is loaded only after an explicit user gesture; no autoplay or external provider.
+const soundFiles = { click: 'click', menu: 'menu-open', gallery: 'gallery-glide', mascot: 'mascot-hello', chat: 'chat-open', sent: 'message-sent', success: 'success', attention: 'attention' } as const;
+type SoundKind = keyof typeof soundFiles;
 export function StudioSound({ compact = false }: { compact?: boolean }) {
   const [effects, setEffects] = useState(false);
   const [music, setMusic] = useState(false);
-  const [error, setError] = useState("");
-  const engine = useRef<AudioContext | null>(null);
-  const musicTimer = useRef<ReturnType<typeof setInterval> | null>(null);
-  const voices = useRef<OscillatorNode[]>([]);
+  const [error, setError] = useState('');
+  const track = useRef<HTMLAudioElement | null>(null);
+  const pool = useRef(new Map<SoundKind, HTMLAudioElement>());
+  const enabled = useRef(false);
+  const musicWanted = useRef(false);
+  const lastEffect = useRef(0);
 
-  function audio() {
-    if (!window.AudioContext) { setError("Suara belum didukung di browser ini."); return null; }
-    const context = engine.current ?? new AudioContext();
-    engine.current = context;
-    void context.resume().catch(() => setError("Suara belum bisa diputar. Coba aktifkan kembali."));
-    return context;
-  }
-
-  function stopMusic() {
-    if (musicTimer.current) clearInterval(musicTimer.current);
-    musicTimer.current = null;
-    voices.current.forEach(voice => { try { voice.stop(); } catch { /* Already ended. */ } voice.disconnect(); });
-    voices.current = [];
+  function playEffect(kind: SoundKind) {
+    if (!enabled.current || document.hidden) return;
+    const now = performance.now();
+    if (now - lastEffect.current < 120) return;
+    lastEffect.current = now;
+    // One voice at a time avoids stacked UI sounds during fast navigation.
+    pool.current.forEach(item => item.pause());
+    let item = pool.current.get(kind);
+    if (!item) { item = new Audio('/sound/wuus-' + soundFiles[kind] + '.mp3'); item.preload = 'none'; pool.current.set(kind, item); }
+    item.volume = kind === 'click' ? .28 : .22;
+    item.currentTime = 0;
+    void item.play().catch((failure: unknown) => {
+      // A newer click or the mute control can intentionally interrupt playback.
+      if (failure instanceof DOMException && failure.name === 'AbortError') return;
+      if (enabled.current) setError('Efek suara belum bisa diputar. Coba aktifkan kembali.');
+    });
   }
 
   function toggleMusic() {
-    if (music) { stopMusic(); setMusic(false); return; }
-    const context = audio();
-    if (!context) return;
-    let chord = 0;
-    const chords = [[130.81, 164.81, 196], [110, 130.81, 164.81], [87.31, 130.81, 174.61], [98, 146.83, 196]];
-    const play = () => {
-      const now = context.currentTime;
-      for (const frequency of chords[chord++ % chords.length]) {
-        const wave = context.createOscillator();
-        const gain = context.createGain();
-        wave.type = "sine";
-        wave.frequency.value = frequency;
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(.012, now + 1.5);
-        gain.gain.linearRampToValueAtTime(0, now + 6);
-        wave.connect(gain); gain.connect(context.destination);
-        voices.current.push(wave);
-        wave.onended = () => { wave.disconnect(); gain.disconnect(); voices.current = voices.current.filter(node => node !== wave); };
-        wave.start(now); wave.stop(now + 6.1);
-      }
-    };
-    play(); musicTimer.current = setInterval(play, 5500); setMusic(true);
+    if (musicWanted.current) { musicWanted.current = false; track.current?.pause(); setMusic(false); return; }
+    const item = track.current ?? new Audio('/sound/wuus-studio-ambient.mp3');
+    track.current = item; item.preload = 'none'; item.loop = true; item.volume = .18;
+    musicWanted.current = true; setError('');
+    void item.play().then(() => {
+      if (musicWanted.current && !document.hidden) setMusic(true);
+      else item.pause();
+    }).catch((failure: unknown) => {
+      if (failure instanceof DOMException && failure.name === 'AbortError') return;
+      musicWanted.current = false; setMusic(false); setError('Musik belum bisa diputar. Coba aktifkan kembali.');
+    });
+  }
+
+  function toggleEffects() {
+    enabled.current = !enabled.current; setEffects(enabled.current); setError('');
+    if (enabled.current) playEffect('click'); else pool.current.forEach(item => item.pause());
   }
 
   useEffect(() => {
-    if (!effects) return;
     const click = (event: MouseEvent) => {
       const target = event.target;
-      if (!(target instanceof Element) || !target.closest("a,button") || target.closest("[data-sound-controls]") || document.hidden) return;
-      const context = engine.current;
-      if (!context || context.state !== "running") return;
-      const wave = context.createOscillator(), gain = context.createGain(), now = context.currentTime;
-      wave.frequency.setValueAtTime(520, now); wave.frequency.exponentialRampToValueAtTime(390, now + .065);
-      gain.gain.setValueAtTime(.022, now); gain.gain.exponentialRampToValueAtTime(.001, now + .075);
-      wave.connect(gain); gain.connect(context.destination);
-      wave.onended = () => { wave.disconnect(); gain.disconnect(); };
-      wave.start(now); wave.stop(now + .08);
+      if (!(target instanceof Element) || target.closest('[data-sound-controls]')) return;
+      const control = target.closest<HTMLElement>('a,button,summary');
+      if (!control || control.matches(':disabled,[aria-disabled="true"],button[type="submit"]')) return;
+      let kind = control.dataset.wuusSound as SoundKind | undefined;
+      if (kind && !(kind in soundFiles)) kind = undefined;
+      if (!kind && control.getAttribute('aria-controls') === 'studio-mobile-menu') {
+        kind = control.getAttribute('aria-expanded') === 'true' ? 'menu' : 'click';
+      }
+      playEffect(kind ?? 'click');
     };
-    document.addEventListener("click", click);
-    return () => document.removeEventListener("click", click);
-  }, [effects]);
+    const semantic = (event: Event) => {
+      const kind = (event as CustomEvent<SoundKind>).detail;
+      if (kind in soundFiles) playEffect(kind);
+    };
+    document.addEventListener('click', click);
+    window.addEventListener('wuus:sound', semantic);
+    return () => { document.removeEventListener('click', click); window.removeEventListener('wuus:sound', semantic); };
+  }, []);
 
   useEffect(() => {
-    const hidden = () => {
-      if (!document.hidden) return;
-      if (musicTimer.current) clearInterval(musicTimer.current);
-      musicTimer.current = null;
-      voices.current.forEach(voice => { try { voice.stop(); } catch { /* Already ended. */ } });
-      voices.current = [];
-      void engine.current?.suspend();
+    const musicTrack = track;
+    const effectPool = pool.current;
+    const stop = () => {
+      musicWanted.current = false; enabled.current = false;
+      musicTrack.current?.pause(); effectPool.forEach(item => item.pause());
       setMusic(false); setEffects(false);
     };
-    document.addEventListener("visibilitychange", hidden);
-    return () => { document.removeEventListener("visibilitychange", hidden); if (musicTimer.current) clearInterval(musicTimer.current); void engine.current?.close(); };
+    const hidden = () => { if (document.hidden) stop(); };
+    document.addEventListener('visibilitychange', hidden);
+    window.addEventListener('pagehide', stop);
+    return () => {
+      document.removeEventListener('visibilitychange', hidden); window.removeEventListener('pagehide', stop);
+      musicWanted.current = false; enabled.current = false;
+      musicTrack.current?.pause(); effectPool.forEach(item => item.pause()); effectPool.clear();
+    };
   }, []);
 
   return <div className={`${s.sound} ${compact ? s.compact : ""}`} data-sound-controls>
     {compact ? null : <span>Suasana studio</span>}
-    <button type="button" aria-label={compact ? `${effects ? "Matikan" : "Aktifkan"} efek suara klik` : undefined} title={`${effects ? "Matikan" : "Aktifkan"} efek suara klik`} aria-pressed={effects} onClick={() => { if (effects) setEffects(false); else if (audio()) setEffects(true); }}><Volume2 size={16} aria-hidden="true" />{compact ? <span className={s.tooltip} aria-hidden="true">Efek suara klik · {effects ? "aktif" : "mati"}</span> : <>Efek suara <b>{effects ? "Aktif" : "Mati"}</b></>}</button>
+    <button type="button" aria-label={compact ? `${effects ? "Matikan" : "Aktifkan"} efek suara klik` : undefined} title={`${effects ? "Matikan" : "Aktifkan"} efek suara klik`} aria-pressed={effects} onClick={toggleEffects}><Volume2 size={16} aria-hidden="true" />{compact ? <span className={s.tooltip} aria-hidden="true">Efek suara klik · {effects ? "aktif" : "mati"}</span> : <>Efek suara <b>{effects ? "Aktif" : "Mati"}</b></>}</button>
     <button type="button" aria-label={compact ? `${music ? "Matikan" : "Aktifkan"} musik latar` : undefined} title={`${music ? "Matikan" : "Aktifkan"} musik latar`} aria-pressed={music} onClick={toggleMusic}><Headphones size={16} aria-hidden="true" />{compact ? <span className={s.tooltip} aria-hidden="true">Musik latar · {music ? "aktif" : "mati"}</span> : <>Musik <b>{music ? "Aktif" : "Mati"}</b></>}</button>
     {error ? <p role="status">{error}</p> : null}
   </div>;

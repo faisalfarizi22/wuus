@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Check, MessageCircle, Monitor, Smartphone } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ChartNoAxesColumnIncreasing, LayoutPanelTop, PanelsTopLeft } from "lucide-react";
 import { BrandArtwork } from "./brand-artwork";
 import { StudioHeader } from "./studio-header";
 import { umkmGeneralInquiry } from "@/lib/umkm-offers";
 import base from "./marketing.module.css";
 import s from "./studio-experience.module.css";
+import h from "./studio-hero.module.css";
 
 export function StudioExperience({ children }: { children: React.ReactNode }) {
   const [night, setNight] = useState(false);
@@ -37,41 +38,50 @@ export function StudioHero() {
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
-  return <section ref={section} className={s.hero} data-visible="true" aria-labelledby="studio-hero-title">
-    <div className={s.heroInner}>
-      <div className={s.heroCopy}>
+  return <section ref={section} className={h.hero} data-visible="true" aria-labelledby="studio-hero-title">
+    <svg className={h.landscape} viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="wuus-paper-back" x1="950" y1="280" x2="1430" y2="860" gradientUnits="userSpaceOnUse"><stop stopColor="var(--hero-fold-light)" /><stop offset="1" stopColor="var(--hero-fold-deep)" /></linearGradient>
+        <linearGradient id="wuus-paper-front" x1="870" y1="520" x2="1150" y2="870" gradientUnits="userSpaceOnUse"><stop stopColor="var(--hero-fold-light)" /><stop offset=".58" stopColor="var(--hero-fold-mid)" /><stop offset="1" stopColor="var(--hero-fold-light)" /></linearGradient>
+      </defs>
+      <path d="M760 900C1090 720 994 253 1257 154C1346 121 1400 104 1500 28V900Z" fill="url(#wuus-paper-back)" />
+      <path d="M760 900C1090 720 994 253 1257 154C1346 121 1400 104 1500 28" stroke="var(--hero-seam)" strokeWidth="2" />
+      <path d="M445 925C794 804 982 750 1152 624C1292 521 1360 440 1500 455V925Z" fill="url(#wuus-paper-front)" />
+      <path d="M445 925C794 804 982 750 1152 624C1292 521 1360 440 1500 455" stroke="var(--hero-seam)" strokeWidth="2" />
+      <path d="M784 920C1120 861 1319 782 1500 668" stroke="var(--hero-seam)" strokeWidth="2" />
+      <path d="M0 786C113 820 128 880 221 925H0Z" fill="var(--hero-fold-mid)" opacity=".45" />
+    </svg>
+    <div className={h.inner}>
+      <div className={h.copy}>
         <h1 id="studio-hero-title">Website usaha.<br /><span>Mulai Rp750 ribu.</span></h1>
         <p>Biar pelanggan mudah melihat produk, mengenal layanan, dan menghubungi Anda. Kami bantu buatkan website yang enak dilihat dan mudah dipakai.</p>
-        <div className={s.heroActions}>
-          <a href={umkmGeneralInquiry()} className={s.primary}><MessageCircle size={19} aria-hidden="true" /> Konsultasi via WhatsApp <ArrowUpRight size={18} aria-hidden="true" /></a>
-          <a href="#pricing" className={s.secondary}>Lihat paket & biaya <ArrowUpRight size={17} aria-hidden="true" /></a>
+        <div className={h.actions}>
+          <a href={umkmGeneralInquiry()} className={h.primary}>Konsultasi via WhatsApp <span><ArrowUpRight size={22} aria-hidden="true" /></span></a>
+          <a href="#pricing" className={h.price}><span><strong>Lihat paket & biaya</strong></span><ArrowUpRight size={19} aria-hidden="true" /></a>
         </div>
-        <p className={s.heroNote}>Biaya pengerjaan sekali bayar. Cakupan dan total biaya disepakati sebelum mulai.</p>
+        <p className={h.note}>Biaya pengerjaan sekali bayar. Cakupan dan total biaya disepakati sebelum mulai.</p>
       </div>
-      <div className={s.world}>
-        <div className={s.designBoard} aria-hidden="true">
-          <svg viewBox="0 0 560 500" className={s.planLines} fill="none"><path d="M38 100H520M38 400H520M70 35V466M490 35V466" stroke="currentColor" strokeWidth="1" /><path d="M38 95V105M510 95V105M65 35H75M65 466H75" stroke="currentColor" strokeWidth="2" /><rect x="83" y="115" width="394" height="265" rx="8" stroke="currentColor" strokeDasharray="5 7" /><path d="M150 365H430M425 360L430 365L425 370" stroke="currentColor" /></svg>
-          <span className={s.boardTop}><Monitor size={16} /> Dirancang untuk usaha Anda</span>
-          <span className={s.boardSide}>Tampilan → fungsi → siap dipakai</span>
-        </div>
-        <Link href="/contoh/dapur-saji" className={s.desktopSample} aria-label="Coba website contoh Dapur Saji">
-          <span className={s.browserBar}><span><i /><i /><i /></span><span>Dapur Saji · Contoh desain</span><ArrowUpRight size={14} /></span>
-          <span className={s.sampleImage}><Image src="/images/concepts/dapur-saji/preview-v2.webp" alt="Contoh tampilan website katering Dapur Saji" fill sizes="(max-width:600px) 68vw, (max-width:1000px) 42vw, 440px" /></span>
-        </Link>
-        <div className={s.mobileSample} aria-hidden="true"><span className={s.phoneSpeaker} /><div className={s.phoneContent}><span>Usaha Anda</span><strong>Produk pilihan.<br />Mudah ditemukan.</strong><div className={s.productBlocks}><i /><i /><i /></div><span className={s.phoneContact}><MessageCircle size={13} /> Hubungi usaha</span></div><span className={s.phoneLabel}><Smartphone size={13} /> Nyaman di ponsel</span></div>
-        <div className={s.planetFloat}>
-          <button type="button" className={s.planet} aria-label="Sapa teman studio WUUS" onClick={() => setGreeting(value => (value + 1) % greetings.length)}>
-            <Image src="/images/studio/wuus-orbit-v2.webp" alt="Teman studio WUUS, globe keramik dengan orbit amber" width={720} height={720} priority sizes="(max-width:600px) 230px, (max-width:1000px) 280px, 360px" />
+      <div className={h.world}>
+        <div className={h.halo} aria-hidden="true" />
+        <svg className={h.orbits} viewBox="0 0 720 720" fill="none" aria-hidden="true">
+          <ellipse cx="360" cy="355" rx="335" ry="208" transform="rotate(-33 360 355)" stroke="var(--hero-orbit)" strokeWidth="1" />
+          <ellipse cx="360" cy="355" rx="328" ry="225" transform="rotate(33 360 355)" stroke="var(--hero-orbit)" strokeWidth="1" strokeDasharray="2 7" />
+          <ellipse cx="360" cy="359" rx="347" ry="192" transform="rotate(-12 360 359)" stroke="var(--hero-seam)" strokeWidth="1.5" />
+        </svg>
+        <div className={h.pedestal} aria-hidden="true"><i /><span /></div>
+        <div className={h.planetFloat}>
+          <button type="button" className={h.planet} data-wuus-sound="mascot" aria-label="Sapa teman studio WUUS" onClick={() => setGreeting(value => (value + 1) % greetings.length)}>
+            <Image src="/images/studio/wuus-orbit-v2.webp" alt="Teman studio WUUS, globe keramik dengan orbit amber" width={960} height={960} priority sizes="(max-width:600px) 96vw, (max-width:999px) 560px, (max-width:1600px) 53vw, 780px" />
           </button>
         </div>
-        <p className={s.greeting} aria-live="polite">{greetings[greeting]}</p>
-        <a className={s.sampleLink} href="#examples">Lihat semua contoh desain <ArrowUpRight size={16} aria-hidden="true" /></a>
+        <div className={h.browserTile} aria-hidden="true"><PanelsTopLeft size={36} strokeWidth={1.8} /></div>
+        <div className={h.chartTile} aria-hidden="true"><ChartNoAxesColumnIncreasing size={36} strokeWidth={2.6} /></div>
+        <div className={h.layoutTile} aria-hidden="true"><LayoutPanelTop size={37} strokeWidth={1.8} /></div>
+        <i className={h.goldOne} aria-hidden="true" /><i className={h.goldTwo} aria-hidden="true" /><i className={h.pearlOne} aria-hidden="true" /><i className={h.pearlTwo} aria-hidden="true" />
+        <p className={h.greeting} aria-live="polite"><svg className={h.spark} viewBox="0 0 32 36" fill="none" aria-hidden="true"><path d="M24 12L20 2M16 20L4 13M15 29L2 31" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></svg>{greetings[greeting]}</p>
       </div>
     </div>
-    <div className={s.trustStrip} aria-label="Cara WUUS mengerjakan website">
-      {["Cakupan dan harga tertulis", "Pratinjau sebelum pelunasan", "Website dan panduan diserahkan"].map(item => <span key={item}><Check size={17} aria-hidden="true" />{item}</span>)}
-      <span className={s.indonesia}>Dari Jakarta, untuk seluruh Indonesia.</span>
-    </div>
+    <div className={h.bottom}><span><i aria-hidden="true" />Website. Katalog. Sistem usaha.</span><a href="#examples">Jelajahi WUUS <ArrowDown size={17} aria-hidden="true" /></a><span>Jakarta · Seluruh Indonesia</span></div>
   </section>;
 }
 

@@ -79,12 +79,14 @@ export default function WebsiteChat() {
     try {
       await request('/api/chat/session', {});
       await request('/api/chat', draft);
+      window.dispatchEvent(new CustomEvent('wuus:sound', { detail: 'sent' }));
       setPending(null); setText('');
       try { sessionStorage.removeItem(STORE); } catch { /* No access token is stored here. */ }
       setNotice('Pesan tersimpan. Tim WUUS akan membalas di percakapan ini saat tersedia.');
       // A failed refresh must not turn a confirmed send into another pending send.
       try { setThread(await request('/api/chat')); } catch { /* Receipt above remains authoritative. */ }
     } catch (failure) {
+      window.dispatchEvent(new CustomEvent('wuus:sound', { detail: 'attention' }));
       if (failure instanceof ChatHttpError && [400,401,403,413,415,429].includes(failure.status)) {
         // These outcomes occur before persistence; editing is safe. Keep the text.
         setPending(null);
@@ -111,6 +113,6 @@ export default function WebsiteChat() {
         <div className={s.actions}><a href={CONTACT} target="_blank" rel="noreferrer">Lanjut di WhatsApp</a><button type="submit" disabled={busy || !text.trim() || !consent}>{busy ? 'Menyimpan…' : pending ? 'Coba kirim lagi' : 'Kirim pesan'}<ArrowUp size={17} aria-hidden="true" /></button></div>
       </form>
     </section>}
-    <button type="button" ref={trigger} className={s.trigger} onClick={toggle} aria-expanded={open} title={open ? 'Tutup percakapan' : 'Konsultasi dengan WUUS'} aria-label={open ? 'Tutup chat WUUS' : 'Buka chat WUUS'}><MessageCircle size={20} aria-hidden="true" /><span>Konsultasi dengan WUUS</span></button>
+    <button type="button" ref={trigger} className={s.trigger} data-wuus-sound={open ? "click" : "chat"} onClick={toggle} aria-expanded={open} title={open ? 'Tutup percakapan' : 'Konsultasi dengan WUUS'} aria-label={open ? 'Tutup chat WUUS' : 'Buka chat WUUS'}><MessageCircle size={20} aria-hidden="true" /><span>Konsultasi dengan WUUS</span></button>
   </div>;
 }

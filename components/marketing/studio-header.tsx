@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
+import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
 import { BrandArtwork } from "./brand-artwork";
 import { StudioSound } from "./studio-sound";
 import s from "./studio-header.module.css";
 
 const links = [
+  { label: "Contoh desain", id: "examples" },
   { label: "Layanan", id: "services" },
   { label: "Harga", id: "pricing" },
-  { label: "Contoh desain", id: "examples" },
   { label: "Cara kerja", id: "process" },
-  { label: "FAQ", id: "faq" },
 ] as const;
+const mobileLinks = [...links, { label: "FAQ", id: "faq" }];
 
 const consultation = "https://wa.me/6281383521750?text=" + encodeURIComponent(
   "Halo WUUS, saya ingin membahas website usaha.\nJenis usaha:\nKota:\nKebutuhan:",
@@ -24,7 +24,6 @@ export function StudioHeader({ night, onToggleNight }: { night: boolean; onToggl
   const [active, setActive] = useState("");
   const header = useRef<HTMLElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const audience = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
     // Observe a reading band below the header, rather than updating on every scroll frame.
@@ -62,10 +61,9 @@ export function StudioHeader({ night, onToggleNight }: { night: boolean; onToggl
     const dismissOutside = (event: PointerEvent) => {
       if (!(event.target instanceof Node)) return;
       if (!header.current?.contains(event.target)) setMenu(false);
-      if (!audience.current?.contains(event.target)) audience.current?.removeAttribute("open");
     };
     // The mobile panel is a disclosure, not a modal: normal page Tab order stays available.
-    const desktop = window.matchMedia("(min-width: 1200px)");
+    const desktop = window.matchMedia("(min-width: 1000px)");
     const resize = () => { if (desktop.matches) setMenu(false); };
     document.addEventListener("pointerdown", dismissOutside);
     desktop.addEventListener("change", resize);
@@ -88,10 +86,7 @@ export function StudioHeader({ night, onToggleNight }: { night: boolean; onToggl
 
   return <header ref={header} className={s.header} data-tone={night ? "night" : "day"} onKeyDown={event => {
     if (event.key !== "Escape") return;
-    if (audience.current?.open) {
-      audience.current.open = false;
-      audience.current.querySelector("summary")?.focus();
-    } else if (menu) {
+    if (menu) {
       setMenu(false);
       menuButton.current?.focus();
     } else return;
@@ -102,17 +97,9 @@ export function StudioHeader({ night, onToggleNight }: { night: boolean; onToggl
       <a href="#main" className={s.brand} aria-label="WUUS — beranda"><BrandArtwork className={s.brandArtwork} /></a>
       <nav className={s.nav} aria-label="Navigasi utama">
         <ul>{links.map(link => <li key={link.id}><a href={`#${link.id}`} aria-current={active === link.id ? "location" : undefined} onClick={() => followSection(link.id)}>{link.label}</a></li>)}</ul>
+        <a href="#contact" className={s.consult} onClick={() => followSection("contact")}>Mari ngobrol <ArrowUpRight size={16} aria-hidden="true" /></a>
       </nav>
       <div className={s.actions}>
-        <details ref={audience} className={s.audience}>
-          <summary>Indonesia <ChevronDown size={14} aria-hidden="true" /></summary>
-          <div className={s.audiencePanel}>
-            <span>Website untuk usaha</span>
-            <a href="#main" aria-current="page" onClick={() => audience.current?.removeAttribute("open")}>Indonesia <span>Bahasa Indonesia</span></a>
-            <Link href="/hospitality" lang="en">Hospitality <span>English · Independent hotels</span></Link>
-            <Link href="/blog" lang="en">Blog <span>English articles</span></Link>
-          </div>
-        </details>
         <div className={s.tools} aria-label="Suasana tampilan">
           <StudioSound compact />
           <button type="button" className={s.iconButton} aria-pressed={night} aria-label={night ? "Aktifkan tampilan siang" : "Aktifkan tampilan malam"} title={night ? "Tampilan siang" : "Tampilan malam"} onClick={onToggleNight}>
@@ -120,14 +107,13 @@ export function StudioHeader({ night, onToggleNight }: { night: boolean; onToggl
             <span className={s.tooltip} aria-hidden="true">{night ? "Tampilan siang" : "Tampilan malam"}</span>
           </button>
         </div>
-        <a href={consultation} className={s.consult}>Konsultasi <ArrowUpRight size={16} aria-hidden="true" /></a>
         <button ref={menuButton} type="button" className={`${s.iconButton} ${s.menuButton}`} aria-expanded={menu} aria-controls="studio-mobile-menu" aria-label={menu ? "Tutup navigasi" : "Buka navigasi"} onClick={() => setMenu(value => !value)}>
           {menu ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}
         </button>
       </div>
     </div>
     {menu ? <div id="studio-mobile-menu" className={s.mobileMenu}>
-      <nav aria-label="Navigasi utama di ponsel"><ul>{links.map(link => <li key={link.id}><a href={`#${link.id}`} aria-current={active === link.id ? "location" : undefined} onClick={() => followSection(link.id)}>{link.label}<ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul></nav>
+      <nav aria-label="Navigasi utama di ponsel"><ul>{mobileLinks.map(link => <li key={link.id}><a href={`#${link.id}`} aria-current={active === link.id ? "location" : undefined} onClick={() => followSection(link.id)}>{link.label}<ArrowUpRight size={16} aria-hidden="true" /></a></li>)}</ul></nav>
       <a href={consultation} className={s.mobileConsult} onClick={() => setMenu(false)}>Konsultasi lewat WhatsApp <ArrowUpRight size={17} aria-hidden="true" /></a>
       <div className={s.mobileAudience}>
         <span>Anda sedang di WUUS Indonesia</span>

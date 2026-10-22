@@ -169,12 +169,12 @@ export function KineticGallery() {
     </div>
     <div className={s.navigation}>
       <div className={s.categories} role="group" aria-label="Geser ke kategori contoh desain">
-        {groups.map(group => <button key={group.category} type="button" aria-pressed={view.category === group.category} aria-controls="design-gallery-rail" onClick={() => visitCategory(group.category)}>{group.category}<span>{group.items.length}</span></button>)}
+        {groups.map(group => <button key={group.category} type="button" data-wuus-sound="gallery" aria-pressed={view.category === group.category} aria-controls="design-gallery-rail" onClick={() => visitCategory(group.category)}>{group.category}<span>{group.items.length}</span></button>)}
       </div>
       <button type="button" className={s.layoutToggle} aria-pressed={layout === "grid"} aria-controls="design-gallery-rail" onClick={() => setLayout(current => current === "rail" ? "grid" : "rail")}><LayoutGrid size={17} aria-hidden="true" />{layout === "rail" ? "Lihat semua" : "Mode geser"}</button>
       {layout === "rail" ? <div className={s.arrows} role="group" aria-label="Navigasi contoh desain">
-        <button type="button" aria-label="Contoh desain sebelumnya" disabled={!view.previous} onClick={() => navigate.current("previous")}><ArrowLeft size={20} /></button>
-        <button type="button" aria-label="Contoh desain berikutnya" disabled={!view.next} onClick={() => navigate.current("next")}><ArrowRight size={20} /></button>
+        <button type="button" data-wuus-sound="gallery" aria-label="Contoh desain sebelumnya" disabled={!view.previous} onClick={() => navigate.current("previous")}><ArrowLeft size={20} /></button>
+        <button type="button" data-wuus-sound="gallery" aria-label="Contoh desain berikutnya" disabled={!view.next} onClick={() => navigate.current("next")}><ArrowRight size={20} /></button>
       </div> : null}
     </div>
     <div ref={rail} id="design-gallery-rail" className={s.rail} role="region" aria-label="Delapan contoh website, dikelompokkan menurut jenis usaha" tabIndex={layout === "rail" ? 0 : undefined}>
